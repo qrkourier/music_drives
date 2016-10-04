@@ -3,7 +3,7 @@
 ###
 # make_music_drives.py
 #
-# Usage: python make_music_drives.pl [genre_key]
+# Usage: python make_music_drives.py [genre_key]
 #
 # Copies tracks within a specific genre tag from:
 #
@@ -12,7 +12,7 @@
 # to any removable drive with enough space. Names target files by open key
 # for sorting on CDJs.
 #
-# Example: $ python make_music_drives.pl techno
+# Example: $ python make_music_drives.py techno
 #
 # Questions:
 # * Danne Stayskal <danne@stayskal.com>
@@ -58,8 +58,8 @@ open_key = {
 
 
 if len(sys.argv) < 2:
-	print "Usage: python make_music_drives.pl [genre_key]"
-	print "Example: python make_music_drives.pl techno"
+	print "Usage: python make_music_drives.py [genre_key]"
+	print "Example: python make_music_drives.py techno"
 	exit(1)
 filter_genre = sys.argv[1]
 print "Building " + filter_genre + " USB drives..."
@@ -124,7 +124,17 @@ print "   " + str(total_size) + " bytes"
 available_volumes = []
 current_user = getpass.getuser()
 print "Finding available USB drives with enough free space that " + current_user + " can write to..."
-for volume in glob.glob("/Volumes/*"):
+# Darwin
+volumes = glob.glob("/Volumes/*")
+# Fedora, Debian
+volumes.extend(glob.glob("/media/*")
+# Chrome
+volumes.extend(glob.glob("/media/removable/*")
+# Ubuntu
+volumes.extend(glob.glob("/media/" + current_user + "/*")
+# Arch
+volumes.extend(glob.glob("/run/media/" + current_user + "/*")
+for volume in volumes:
 	stat_info = os.stat(volume)
 	owner = pwd.getpwuid(stat_info.st_uid)[0]
 	if current_user == owner:
